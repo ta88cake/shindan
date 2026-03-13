@@ -18,7 +18,7 @@ export default async function handler(req, res) {
     }
 
     const geminiRes = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=" +
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=" +
         apiKey,
       {
         method: "POST",
