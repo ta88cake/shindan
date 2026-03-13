@@ -492,13 +492,66 @@ const IntroScreen = memo(({ onBack, onNext }) => {
             onClick={() => onNext({ nickname: nickname.trim(), birthday: birthdayValue })}
             disabled={!canNext}
           >
-            診断をはじめる
+            次へ
           </PrimaryBtn>
         </div>
       </div>
     </div>
   );
 });
+
+// ─── Language selection ───────────────────────────────────
+const LANG_OPTIONS = [
+  { id: "ja", label: "日本語" },
+  { id: "ko", label: "韓国語" },
+  { id: "en", label: "英語" },
+  { id: "ru", label: "ロシア語" },
+  { id: "zh", label: "中国語" },
+];
+
+const LanguageScreen = memo(({ onBack, onNext }) => (
+  <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: C.paper, animation: "kFadeIn .4s ease both" }}>
+    <Nav onBack={onBack} backLabel="戻る" />
+    <div style={{ flex: 1, padding: "32px 28px 48px", display: "flex", flexDirection: "column", gap: 24 }}>
+      <div>
+        <Label style={{ display: "block", marginBottom: 12 }}>言語を選んでください</Label>
+        <h2 style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 400, color: C.ink, lineHeight: 1.6 }}>
+          表示する言語を選んでください
+        </h2>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 16 }}>
+        {LANG_OPTIONS.map(opt => (
+          <button
+            key={opt.id}
+            onClick={() => onNext(opt.id)}
+            style={{
+              width: "100%",
+              padding: "16px 20px",
+              textAlign: "left",
+              background: "transparent",
+              border: `1px solid ${C.rule}`,
+              borderRadius: 8,
+              fontFamily: SERIF,
+              fontSize: 16,
+              color: C.ink,
+              cursor: "pointer",
+              transition: "border-color .2s, background .2s",
+            }}
+            onMouseEnter={e => { e.target.style.borderColor = C.sienna; e.target.style.background = C.cream; }}
+            onMouseLeave={e => { e.target.style.borderColor = C.rule; e.target.style.background = "transparent"; }}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
+      <div style={{ marginTop: "auto", paddingTop: 24 }}>
+        <p style={{ fontFamily: SANS, fontSize: 12, fontWeight: 300, color: C.ash, textAlign: "center" }}>
+          選択した言語は診断結果の表示に利用されます
+        </p>
+      </div>
+    </div>
+  </div>
+));
 
 // ─── Quiz ─────────────────────────────────────────────────
 const QuizScreen = memo(({ onNext }) => {
@@ -978,7 +1031,7 @@ const DEFAULT_MATCHES = [
   {
     id: "m2",
     name: "Bさん",
-    score: 6,
+    score: 5,
     note:
       "7月27日 LEO（しし座）【基本データ】太陽： しし座　支配星： しし座／太陽　位置： 3°45'-5° しし座　状態： 不動宮　元素： 火　星の名前： なし\n" +
       "知識欲と探究心が強く、独創的なアイディアの持ち主。彼は愛想がよく、思いやりと第六感を備えており、強い個性を持つ、感受性の鋭いしし座です。知識欲と探究心が強く、独創的で、想像力と好奇心にあふれています。意志が強く進歩的な思考を持つ彼は、精神的刺激を追求し、常に新しいアイディアにあふれています。理解力に富み、最新の情報に遅れないために、書籍や雑誌の情報、日進月歩のコンピューターの技術を収集しています。支配星のしし座の隠れた影響により、魅力にあふれ、外見がよく、生き生きとしています。誰からも好かれ、人と親密に交流できるでしょう。本来、両極端な性格を持つ彼ですが、寛大さと過敏な面、不安定な面と頑固な面とのバランスをとりましょう。社交的で気前がよく、強引な彼は、一般大衆を相手にするのを好み、外交や広報が得意です。刺激を受ければ、どんなことでも熱心に始めますが、しばしば準備不足。飽きやすく、関心の対象が多すぎるために、集中することができません。また、アイディアにあふれていますが、それを形にするのは少々苦手。優れた発想を実行するために試行錯誤していくとよいでしょう。\n" +
@@ -991,7 +1044,7 @@ const DEFAULT_MATCHES = [
   {
     id: "m3",
     name: "Cさん",
-    score: 5,
+    score: 4,
     note:
       "11月29日 SAGITTARIUS（いて座）【基本データ】太陽： いて座　支配星： いて座／木星　位置： 6°30'-7°30' いて座　状態： 柔軟宮　元素： 火　星の名前： なし\n" +
       "強い信念を持つ、誠実で正直者。彼女は活力と気力にあふれ、理解力があり臨機応変な、精神的な安定を望む思いやりのある人物です。直感力が鋭いので、人の話の真意を理解できますが、相手と一定の距離を保つべき。本来理想主義ですが、野心と優れた実務感覚を持っているので、地に足をつけて慎重に行動するとよいでしょう。支配星の木星の影響は、何よりも誠実さを大切にするまじめで理想主義な面に表れます。情熱的で楽観的、視野が広く探究心があるため、真実や悟りを求めてはるか遠くに旅することもあるでしょう。しかし世の中を普通に生きていくには、柔軟性がなさすぎる点が足かせとなります。強い信念や意見を持ち誠実で率直な性格であるため、思っていることをずばりと口にします。誠実で正直ですので、約束はきちんと守る人です。精力的に働き一生懸命になれるので、周りから信頼を受けます。気前がよすぎる点に注意。十分な見返りと慈善的なふるまいのバランスをとるように心がけましょう。\n" +
@@ -1101,6 +1154,71 @@ const MatchesScreen = memo(({ matches, onBackToResult, onOpenDetail }) => (
 
 const MatchDetailScreen = memo(({ match, onBack }) => {
   if (!match) return null;
+  const renderNote = (text) => {
+    const lines = (text || "").split("\n");
+    const taglines = new Set([
+      "気まぐれな性格も人生の原動力。",
+      "知識欲と探究心が強く、独創的なアイディアの持ち主",
+      "強い信念を持つ、誠実で正直者",
+    ]);
+
+    return lines.map((raw, i) => {
+      const line = raw.trim();
+      if (!line) {
+        return <div key={i} style={{ height: 8 }} />;
+      }
+      if (line.startsWith("【") && line.endsWith("】")) {
+        return (
+          <p
+            key={i}
+            style={{
+              fontFamily: SERIF,
+              fontSize: 16,
+              fontWeight: 500,
+              color: C.ink,
+              margin: "18px 0 4px",
+              textAlign: "left",
+            }}
+          >
+            {line}
+          </p>
+        );
+      }
+      if (taglines.has(line)) {
+        return (
+          <p
+            key={i}
+            style={{
+              fontFamily: SERIF,
+              fontSize: 17,
+              fontWeight: 500,
+              color: C.ink,
+              margin: "14px 0 6px",
+              textAlign: "left",
+            }}
+          >
+            {line}
+          </p>
+        );
+      }
+      return (
+        <p
+          key={i}
+          style={{
+            fontFamily: SANS,
+            fontSize: 15,
+            fontWeight: 300,
+            color: C.stone,
+            lineHeight: 2.0,
+            margin: "0 0 6px",
+            textAlign: "left",
+          }}
+        >
+          {line}
+        </p>
+      );
+    });
+  };
   return (
     <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: C.paper, animation: "kFadeIn .4s ease both" }}>
       <Nav
@@ -1124,25 +1242,26 @@ const MatchDetailScreen = memo(({ match, onBack }) => {
           </button>
         }
       />
-      <div style={{ flex: 1, padding: "32px 28px 48px", display: "flex", flexDirection: "column", gap: 28 }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <MatchAvatar name={match.name} />
-            <span style={{ fontFamily: SERIF, fontSize: 20, color: C.ink }}>{match.name}</span>
-          </div>
-          <div style={{ textAlign: "right" }}>
-            <Label>あなたとの相性</Label>
-            <div style={{ marginTop: 6 }}>
-              <MatchStars score={match.score} />
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
+        <div style={{ padding: "24px 28px", flexShrink: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+              <MatchAvatar name={match.name} />
+              <span style={{ fontFamily: SERIF, fontSize: 20, color: C.ink }}>{match.name}</span>
+            </div>
+            <div style={{ textAlign: "right" }}>
+              <Label>あなたとの相性</Label>
+              <div style={{ marginTop: 6 }}>
+                <MatchStars score={match.score} />
+              </div>
             </div>
           </div>
+          <Divider style={{ marginTop: 24 }} />
         </div>
 
-        <Divider />
-
-        <p style={{ fontFamily: SANS, fontSize: 14, fontWeight: 300, color: C.stone, lineHeight: 2.0 }}>
-          {match.note}
-        </p>
+        <div style={{ flex: 1, overflowY: "auto", padding: "0 28px 48px", paddingTop: 8 }}>
+          {renderNote(match.note)}
+        </div>
       </div>
     </div>
   );
@@ -1151,8 +1270,9 @@ const MatchDetailScreen = memo(({ match, onBack }) => {
 // ─── Reducer & Root ───────────────────────────────────────
 function reducer(state, action) {
   switch (action.type) {
-    case "START":     return { screen: "intro" };
-    case "INTRO_DONE": return { ...state, screen: "quiz", profile: action.profile };
+    case "START":      return { screen: "intro" };
+    case "INTRO_DONE": return { ...state, screen: "language", profile: action.profile };
+    case "LANG_DONE":  return { ...state, screen: "quiz", lang: action.lang };
     case "QUIZ_DONE":  return { ...state, screen: "loading", scores: action.scores };
     // 以降の FREE_DONE / LLM_DONE は現在は使用しないが、将来の拡張用に残しておく
     case "FREE_DONE":  return { ...state, screen: "llm",  freeData: action.data };
@@ -1166,6 +1286,8 @@ function reducer(state, action) {
       return { ...state, screen: "result" };
     case "BACK_TO_MATCHES":
       return { ...state, screen: "matches" };
+    case "BACK_TO_INTRO":
+      return { ...state, screen: "intro" };
     case "RESTART":   return { screen: "landing" };
     default: return state;
   }
@@ -1197,6 +1319,12 @@ export default function App() {
           <IntroScreen
             onBack={() => dispatch({ type: "RESTART" })}
             onNext={profile => dispatch({ type: "INTRO_DONE", profile })}
+          />
+        )}
+        {st.screen === "language" && (
+          <LanguageScreen
+            onBack={() => dispatch({ type: "BACK_TO_INTRO" })}
+            onNext={lang => dispatch({ type: "LANG_DONE", lang })}
           />
         )}
         {st.screen === "quiz" && (
