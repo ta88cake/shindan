@@ -18,7 +18,7 @@ export default async function handler(req, res) {
     }
 
     const geminiRes = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=" +
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=" +
         apiKey,
       {
         method: "POST",
@@ -42,13 +42,24 @@ export default async function handler(req, res) {
 
     const data = await geminiRes.json();
     const candidates = data.candidates || [];
-    const text =
-      candidates[0]?.content?.parts?.map((p) => p.text || "").join("") || "";
+    let text = "";
+    const firstCandidate = candidates[0];
+    if (firstCandidate?.content?.parts?.length) {
+      text = firstCandidate.content.parts
+        .map((p) => (typeof p.text === "string" ? p.text : ""))
+        .join("");
+    }
+    text = (text || "").trim();
+    if (!text) {
+      console.error("Gemini empty response:", JSON.stringify(data).slice(0, 500));
+      res.status(502).json({ error: "empty_response", raw: data?.candidates?.[0]?.finishReason });
+      return;
+    }
 
     res.status(200).json({ text });
   } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: "internal_error" });
+    console.error("analyze API error:", e);
+    res.status(500).json({ error: "internal_error", message: e?.message });
   }
 }
 
