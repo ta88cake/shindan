@@ -155,15 +155,17 @@ function buildPrompt(scores, freeData, llmResponse) {
     return `${q.label}:\n${items.map((v,i) => `  ${i+1}. ${v.text}`).join("\n")}`;
   }).filter(Boolean).join("\n\n");
 
-  return `あなたは深層心理と人間関係の専門家です。
-以下の3種類のデータを統合し、この人物への誠実で深い分析文を生成してください。
+  return `あなたは、誕生日占いや数秘術の本の文章を書くプロのライターです。
+以下のデータをもとに、その人が手に取りたくなる「誕生日・性格分析の本」の1ページのような文章を書いてください。
 
-ルール：
-- タイプ名・ラベル・分類を一切使わない（「〜型」「〜タイプ」禁止）
-- 花・動物・星座などの比喩を使わない
-- 「あなたは〜」という二人称で書く
-- 褒めるだけでなく、影・盲点・課題を誠実に含める
-- 合計2000字以上
+■ 文体・スタイルの指定
+- 市販の「誕生日別 性格・運勢・相性」の本（数秘術・占い本）のトーンに合わせること。
+- 見出しは【】で囲む形式で書く（例：【恋愛と人間関係】【数秘術によるあなたの運勢】【仕事と適性】【隠された自己】）。
+- 段落はやや長めに、丁寧で読みやすい日本語。二人称「あなたは〜」で統一。
+- ネガティブな表現や短所の羅列は避け、長所や可能性・アドバイスは肯定的に書く。
+- 合計2000字以上。
+
+■ 入力データ
 
 【データ1: 30問スコア（各軸の合計値）】
 エネルギー軸（負=共鳴的, 正=独奏的）: ${scores?.RS ?? 0}
@@ -171,36 +173,27 @@ function buildPrompt(scores, freeData, llmResponse) {
 判断軸（負=論理的, 正=共感的）:       ${scores?.LE ?? 0}
 行動軸（負=計画的, 正=流動的）:       ${scores?.SF ?? 0}
 
-【データ2: 自由記述】
+【データ2: 自由記述（好きな本・映画・音楽など）】
 ${freeText || "（未入力）"}
 
 【データ3: AIによる深層分析（ユーザーの会話履歴から）】
 ${llmResponse?.trim() || "（未入力）"}
 
 ---
-以下の4セクションをそれぞれ日本語で生成してください。
-セクション区切りは必ず「[SECTION_N]」の形式で明示すること。
+■ 出力形式
+必ず3セクションに分け、各区切りの直前に [SECTION_N] を1行で書くこと。
 
 [SECTION_1]
-総合性格分析（700字以上）
-内面・世界との関わり方・価値観の核心を描写する。
-強みも影も誠実に。この人固有の質感を描くこと。
+「総合性格・運勢」に相当する部分（700字以上）。
+【数秘術によるあなたの運勢】や【仕事と適性】のような見出しを本文中に含め、本の1ページ目のように、運勢・適性・人生の方向性を段落で描写すること。
 
 [SECTION_2]
-恋愛傾向の分析（500字以上）
-無意識のパターン・求めているもの・傷つき方・
-繰り返しやすい関係性の構造を正直に描写する。
+「恋愛と人間関係」に相当する部分（500字以上）。
+【恋愛と人間関係】のような見出しを本文中に含め、恋愛傾向・人との関わり方・パートナーシップを、占い本らしい温かみのある文体で描写すること。
 
 [SECTION_3]
-相性のいい人物像（400字以上）
-「理想の相手」ではなく「この人が最も生き生きできる
-関係を作れる相手」を具体的に描写する。
-性格・価値観・コミュニケーションスタイルを含めること。
-
-[SECTION_4]
-あなたへのメッセージ（300字以上）
-次のステージへ向けた温かく誠実な一言。
-説教にならず、この人の固有の文脈に寄り添うこと。`;
+「隠された自己・長所」に相当する部分（400字以上）。
+【隠された自己】のような見出しと、必要に応じて●長所のような箇条書きを入れてよい。ネガティブな表現は使わず、この人の魅力・強み・可能性だけを書くこと。`;
 }
 
 // ─── Parse API response into sections ────────────────────
@@ -943,13 +936,12 @@ const ResultScreen = memo(({ sections: rawSections, scores, onViewMatches }) => 
           <SectionBlock number={2} label="恋愛傾向" text={sections.s2} accent={C.siennaLt} />
           <SectionBlock number={3} label="相性のいい人物像" text={sections.s3} />
 
-          {/* Section 4 — letter style */}
+          {/* Section 4 — 固定メッセージ */}
           <div style={{ padding: "40px 0 56px" }}>
             <div style={{ display: "flex", alignItems: "baseline", gap: 16, marginBottom: 28 }}>
               <span style={{ fontFamily: MONO, fontSize: 9, color: C.ash }}>04</span>
               <Label>あなたへ</Label>
             </div>
-            {/* pull-quote style for the personal message */}
             <div style={{
               borderLeft: `2px solid ${C.sienna}`,
               paddingLeft: 20, marginBottom: 0, textAlign: "left",
@@ -958,9 +950,7 @@ const ResultScreen = memo(({ sections: rawSections, scores, onViewMatches }) => 
                 fontFamily: SERIF, fontSize: 15, fontStyle: "italic",
                 color: C.ink, lineHeight: 2.2, textAlign: "left",
               }}>
-                {(sections.s4 || "").split("\n").map((line, i, arr) => (
-                  <span key={i}>{line}{i < arr.length - 1 && <br />}</span>
-                ))}
+                あなたの運命の人の誕生日：8月8日
               </p>
             </div>
           </div>
