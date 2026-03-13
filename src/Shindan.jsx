@@ -1155,69 +1155,70 @@ const MatchesScreen = memo(({ matches, onBackToResult, onOpenDetail }) => (
 const MatchDetailScreen = memo(({ match, onBack }) => {
   if (!match) return null;
   const renderNote = (text) => {
-    const lines = (text || "").split("\n");
-    const taglines = new Set([
+    const full = (text || "").trim();
+    const taglineStarts = [
       "気まぐれな性格も人生の原動力。",
-      "知識欲と探究心が強く、独創的なアイディアの持ち主",
-      "強い信念を持つ、誠実で正直者",
-    ]);
+      "知識欲と探究心が強く、独創的なアイディアの持ち主。",
+      "強い信念を持つ、誠実で正直者。",
+    ];
+    const out = [];
+    let i = 0;
 
-    return lines.map((raw, i) => {
-      const line = raw.trim();
-      if (!line) {
-        return <div key={i} style={{ height: 8 }} />;
-      }
-      if (line.startsWith("【") && line.endsWith("】")) {
-        return (
-          <p
-            key={i}
-            style={{
-              fontFamily: SERIF,
-              fontSize: 16,
-              fontWeight: 500,
-              color: C.ink,
-              margin: "18px 0 4px",
-              textAlign: "left",
-            }}
-          >
-            {line}
-          </p>
-        );
-      }
-      if (taglines.has(line)) {
-        return (
-          <p
-            key={i}
-            style={{
-              fontFamily: SERIF,
-              fontSize: 17,
-              fontWeight: 500,
-              color: C.ink,
-              margin: "14px 0 6px",
-              textAlign: "left",
-            }}
-          >
-            {line}
-          </p>
-        );
-      }
-      return (
-        <p
-          key={i}
-          style={{
-            fontFamily: SANS,
-            fontSize: 15,
-            fontWeight: 300,
-            color: C.stone,
-            lineHeight: 2.0,
-            margin: "0 0 6px",
-            textAlign: "left",
-          }}
-        >
-          {line}
+    const pushHeading = (content, size = 16) => {
+      out.push(
+        <p key={i++} style={{ fontFamily: SERIF, fontSize: size, fontWeight: 500, color: C.ink, margin: "18px 0 6px", textAlign: "left" }}>
+          {content}
         </p>
       );
-    });
+    };
+    const pushBody = (content) => {
+      if (!content.trim()) return;
+      out.push(
+        <p key={i++} style={{ fontFamily: SANS, fontSize: 15, fontWeight: 300, color: C.stone, lineHeight: 2.0, margin: "0 0 10px", textAlign: "left" }}>
+          {content}
+        </p>
+      );
+    };
+
+    const lines = full.split("\n");
+    for (const raw of lines) {
+      const line = raw.trim();
+      if (!line) {
+        out.push(<div key={i++} style={{ height: 12 }} />);
+        continue;
+      }
+      if (line.includes("【基本データ】")) {
+        const [before, after] = line.split("【基本データ】");
+        const title = before.trim();
+        const dataBlock = (after || "").trim();
+        if (title) pushHeading(title, 18);
+        pushHeading("【基本データ】", 16);
+        if (dataBlock) {
+          dataBlock.split(/\s*　\s*/).filter(Boolean).forEach(part => pushBody(part));
+        }
+        continue;
+      }
+      if (line.startsWith("【")) {
+        const close = line.indexOf("】");
+        if (close !== -1) {
+          pushHeading(line.slice(0, close + 1), 16);
+          const rest = line.slice(close + 1).trim();
+          if (rest) pushBody(rest);
+        } else {
+          pushHeading(line, 16);
+        }
+        continue;
+      }
+      const tag = taglineStarts.find(t => line.startsWith(t));
+      if (tag) {
+        pushHeading(tag, 17);
+        const rest = line.slice(tag.length).trim();
+        if (rest) pushBody(rest);
+        continue;
+      }
+      pushBody(line);
+    }
+    return out;
   };
   return (
     <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", background: C.paper, animation: "kFadeIn .4s ease both" }}>
